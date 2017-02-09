@@ -22,7 +22,8 @@ class Data(object):
 
 	def save_word(self):
 		self.open_connection()
-		self.c.execute("INSERT INTO words(word) VALUES ('"+self.word+"')")
+		word = self.word.replace("'", "\\'").encode('utf-8')
+		self.c.execute('INSERT INTO words(word) VALUES ("'+self.word+'")')
 		self.conn.commit()
 		save = self.c.execute("SELECT id FROM words WHERE id = (SELECT MAX(id)  FROM words)")
 		self.save_def(save.fetchone()[0])
@@ -32,8 +33,9 @@ class Data(object):
 		self.open_connection()
 		index = str(index)
 		for item in self.definition:
-			yolo = item.text_content().encode('utf-8')
-			print(yolo)
-			# self.c.execute("INSERT INTO definitions(word_id,definition) VALUES ('"+index+"','"+str(yolo)+"')")
+			yolo = item.text_content().encode('utf-8', 'ignore').decode('utf-8')
+			right_string = yolo.replace("'", "\\'").encode('utf-8')
+			print(right_string)
+			self.c.execute('INSERT INTO definitions(word_id,definition) VALUES ("'+index+'","'+right_string+'")')
 		self.conn.commit()
 		self.conn.close()
